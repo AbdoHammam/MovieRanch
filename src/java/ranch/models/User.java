@@ -1,7 +1,6 @@
 package ranch.models;
 
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -27,6 +26,22 @@ public class User {
     private String address;
     private boolean isAdmin;
     private ArrayList<Movie> rentedMovies;
+    
+    public User() {
+        //Empty Constructor
+    }
+    public User(int id, String username, String email, String password, 
+            double balance, Timestamp dateOfJoin, String gender, String address, boolean isAdmin) {
+        this.id = id;
+        this.username = username;
+        this.email = email;
+        this.password = password;
+        this.balance = balance;
+        this.dateOfJoin = dateOfJoin;
+        this.gender = gender;
+        this.address = address;
+        this.isAdmin = isAdmin;
+    }
 
     public Timestamp getDateOfJoin() {
         return dateOfJoin;

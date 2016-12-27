@@ -6,6 +6,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.ServletException;
@@ -37,38 +39,41 @@ public class Utilities extends HttpServlet {
 
         String option = request.getParameter("option"); //What action should be taken
         try (PrintWriter out = response.getWriter()) {
-            if (option.equals("login")) {
-                out.print(doLogin(request.getParameter("user"),
-                        request.getParameter("pass"), request, response));
-            } else if (option.equals("signup")) {
-                //TO-DO
-            } else if (option.equals("getPassword")) {
+            if (option.equals("login")) 
+                out.print(doLogin(request, response));
+            else if(option.equals("signup")) 
+                out.print(doSignUp(request, response));
+            else if (option.equals("getPassword"))
                 out.print(User.getPassword(Integer.parseInt(request.getParameter("id"))));
-            } else if (option.equals("rentMovie")) {
+            else if (option.equals("rentMovie"))
                 out.print(rent(request));
-            } else if(option.equals("search")){
+            else if(option.equals("search"))
                 out.print(search(request));
+            else if(option.equals("addMovie"))
+                out.print(doAddMovie(request));
+            else {
+                SessionControl.removeSession(request, response);
+                response.sendRedirect("login");                
             }
 
-        } catch (Exception e){
+        } catch (Exception e) {
             response.getWriter().write(e.getStackTrace().toString());
-        }
-        finally {
+        } finally {
             if (con != null) {
                 con.close();
             }
         }
     }
 
-    private String doLogin(String name, String password, HttpServletRequest request,
-            HttpServletResponse response) throws SQLException {
+    private String doLogin(HttpServletRequest request, HttpServletResponse response)
+            throws SQLException {
         con = DatabaseConnection.getActiveConnection();
         PreparedStatement stmt = con.prepareStatement("SELECT * FROM user WHERE name = ? AND password = ?");
-        stmt.setString(1, name);
-        stmt.setString(2, password);
-
+        stmt.setString(1, request.getParameter("user"));
+        stmt.setString(2, request.getParameter("pass"));
+        
         ResultSet resultSet = stmt.executeQuery();
-        if (resultSet.next()) {
+        if(resultSet.next()) {
             User user = new User();
             user.setId(resultSet.getInt(1));
             user.setUsername(resultSet.getString(2));
@@ -77,19 +82,78 @@ public class Utilities extends HttpServlet {
             user.setBalance(resultSet.getDouble(5));
             user.setAddress(resultSet.getString(6));
             user.setEmail(resultSet.getString(7));
-            user.setIsAdmin(resultSet.getInt(8) == 1);
+            user.setIsAdmin(resultSet.getInt(8)== 1);
             user.setPassword(resultSet.getString(9));
-
+          
             request.getSession().setAttribute("user", user);
             SessionControl.saveSession(request, response);
             return "OK";
-        } else {
+        } else
             return "BAD";
+    }
+    
+    private String doSignUp(HttpServletRequest request, HttpServletResponse response)
+            throws SQLException {
+        con = DatabaseConnection.getActiveConnection();
+        PreparedStatement stmt = con.prepareStatement("SELECT id FROM user WHERE name = ?");
+        stmt.setString(1, request.getParameter("user"));
+        
+        ResultSet resultSet = stmt.executeQuery();
+        if(resultSet.next())
+            return "BAD";
+        else {
+            User user = new User();
+            stmt = con.prepareStatement("INSERT INTO user (name, dateOfJoin, gender, balance, address, email, isAdmin, password)"
+                    + " VALUES (?, ?, ?, ?, ?, ?, ?, ?)", PreparedStatement.RETURN_GENERATED_KEYS);
+            stmt.setString(1, request.getParameter("user"));
+            user.setUsername(request.getParameter("user"));
+            stmt.setTimestamp(2, new Timestamp(new Date().getTime()));
+            user.setDateOfJoin(new Timestamp(new Date().getTime()));
+            stmt.setString(3, "male");
+            user.setGender("male"); //Welcome to our masculine society
+            stmt.setDouble(4, Double.parseDouble(request.getParameter("balance")));
+            user.setBalance(Double.parseDouble(request.getParameter("balance")));
+            stmt.setString(5, "UNNKOWN");
+            user.setAddress("UNKNOWN");
+            stmt.setString(6, request.getParameter("email"));
+            user.setEmail(request.getParameter("email"));
+            stmt.setInt(7, 0);
+            user.setIsAdmin(false);
+            stmt.setString(8, request.getParameter("pass"));
+            user.setPassword(request.getParameter("pass"));
+            stmt.executeUpdate();
+            
+            resultSet = stmt.getGeneratedKeys(); //Won't be referenced by column name
+            if(resultSet.next()) {
+                System.out.println("ID: " + resultSet.getInt(1));
+                user.setId(resultSet.getInt(1));
+                request.getSession().setAttribute("user", user);
+                SessionControl.saveSession(request, response);
+            }
+            return "OK";
         }
     }
-
-    private String doSignUp() {
-        return null;
+    
+    private String doAddMovie(HttpServletRequest request) 
+            throws SQLException {
+        con = DatabaseConnection.getActiveConnection();
+        PreparedStatement stmt = con.prepareStatement("INSERT INTO movie "
+                + "(name, genre, description, availableNumber, rentedNumber, rating, posterLink, yearOfRelease, rentingPrice, director, leadActor, leadActress) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        stmt.setString(1, request.getParameter("name"));
+        stmt.setString(2, Movie.Genre.WAR.toString());
+        stmt.setString(3, "No Description");
+        stmt.setInt(4, Integer.parseInt(request.getParameter("copies")));
+        stmt.setInt(5, 0);
+        stmt.setInt(6, Integer.parseInt(request.getParameter("rating")));
+        stmt.setString(7, request.getParameter("poster"));
+        stmt.setInt(8, Integer.parseInt(request.getParameter("year")));
+        stmt.setInt(9, Integer.parseInt(request.getParameter("price")));
+        stmt.setString(10, request.getParameter("director"));
+        stmt.setString(11, request.getParameter("actor"));
+        stmt.setString(12, request.getParameter("actress"));
+        stmt.executeUpdate();
+        return "OK";
     }
 
     private String rent(HttpServletRequest request) {
@@ -141,5 +205,4 @@ public class Utilities extends HttpServlet {
     public String getServletInfo() {
         return "Short description";
     }
-
 }

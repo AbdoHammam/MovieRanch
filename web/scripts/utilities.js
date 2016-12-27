@@ -51,19 +51,17 @@ function validateLogin() {
 }
 
 function prepareLogin() {
-    var user = document.getElementsByName("user")[0];
-    var passwordField = document.getElementsByName("pass")[0];
     var params = {
         option: "login",
-        user: user.value, 
-        pass: passwordField.value
+        user: document.getElementsByName("user")[0].value, 
+        pass: document.getElementsByName("pass")[0].value
     };
     return jQuery.param(params); //Encode URL parameters
 }
 
 function loginHandle(response) {
     if(response === 'OK')
-        window.location.assign("/home");
+        window.location.assign("home");
     else {
         var form = document.forms[0];
         form.children[0].className += " has-error";
@@ -71,7 +69,7 @@ function loginHandle(response) {
         var error = form.querySelectorAll("p")[2];
         error.innerHTML = "*wrong username or password";
         error.removeAttribute("hidden");
-        document.querySelector("input[type=button]").disabled = false;
+        form.login.disabled = false;
     }
 }
     
@@ -86,13 +84,14 @@ function validateSignUp() {
     };
     
     var form = document.forms[1];
+    
     var info = form.user.value;
     var error = form.querySelectorAll("p")[0];
-
     if(info.length === 0) {
         form.children[0].className += " has-error";
         error.innerHTML = "*username is required";
         error.removeAttribute("hidden");
+        return false;
     }
     
     info = form.pass.value;
@@ -116,6 +115,7 @@ function validateSignUp() {
         error.innerHTML = passwordVerifier.errors.join("<br>");
         form.children[3].className += " has-error";
         error.removeAttribute("hidden");
+        return false;
     }
     
     info = form.repass.value;
@@ -124,6 +124,7 @@ function validateSignUp() {
         error.innerHTML = "*the two passwords don't match";
         form.children[6].className += " has-error";
         error.removeAttribute("hidden");
+        return false;
     }
     
     info = form.email.value;
@@ -132,7 +133,59 @@ function validateSignUp() {
         error.innerHTML = "*incorrect email format";
         form.children[9].className += " has-error";
         error.removeAttribute("hidden");
+        return false;
     }
+    return true;
+}
+
+function prepareSignUp() {
+    var params = {
+        option: "signup",
+        user: document.getElementsByName("user")[1].value,
+        pass: document.getElementsByName("pass")[1].value,
+        repass: document.getElementsByName("repass")[0].value,
+        email: document.getElementsByName("email")[0].value,
+        balance: document.getElementsByName("balance")[0].value
+    };
+    return jQuery.param(params);
+}
+
+function signUpHandle(response) {
+    if(response === 'OK')
+        window.location.assign("home");
+    else {
+        var form = document.forms[1];
+        form.children[0].className += " has-error";
+        form.user.select();
+        var error = form.querySelectorAll("p")[0];
+        error.innerHTML = "*username is taken by someone else";
+        error.removeAttribute("hidden");
+        form.signup.disabled = false;
+    }
+}
+
+function prepareAddMovie() {
+    var form = document.forms[1];
+    var params = {
+        option: "addMovie",
+        name: form.title.value,
+        year: form.year.value,
+        copies: form.copies.value,
+        poster: form.poster.value,
+        price: form.price.value,
+        director: form.director.value,
+        actor: form.actor.value,
+        actress: form.actress.value,
+        rating: form.rating.value
+    };
+    return jQuery.param(params);
+}
+
+function addMovieHandle(response) {
+    if(response === 'OK')
+        alert("Movie Added Successfully!");
+    else
+        alert("Error Adding Movie!");
 }
 
 function jxRequest(method, url, prepare, handle) {
@@ -142,7 +195,7 @@ function jxRequest(method, url, prepare, handle) {
     xhr.setRequestHeader("content-type", "application/x-www-form-urlencoded");
     xhr.onreadystatechange = function() {
         if(xhr.readyState === xhr.DONE && xhr.status === HttpStatusCode.OK) {
-            console.log("We're in!");
+            console.log(xhr.responseText);
             handle(xhr.responseText);
         }
     };

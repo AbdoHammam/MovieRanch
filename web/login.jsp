@@ -15,13 +15,13 @@
         <meta name="keywords" content="login, sign in, sign up, register, enter, create account">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>Login | Movie Ranch</title>
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-        <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css" />
-        <link rel="stylesheet" href="http://jquery.com/jquery-wp-content/themes/jquery/css/base.css?v=1">
+        <link rel="stylesheet" href="styles/bootstrap.min.css">
+        <link rel="stylesheet" href="styles/jquery-ui.css" />
+        <link rel="stylesheet" href="styles/base.css">
         <link rel="stylesheet" href="styles/main.css">
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-        <script src="http://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+        <script src="scripts/jquery.min.js"></script>
+        <script src="scripts/bootstrap.min.js"></script>
+        <script src="scripts/jquery-ui.min.js"></script>
         <script src="scripts/utilities.js?version=<%=new Random().nextInt(1000)%>"></script>
         <script>
             $( function() {
@@ -76,10 +76,10 @@
                         <p class="error-msg" hidden><p> <!-- 2 -->
                             
                         <div class="input-group">
-                            <input class="btn btn-success ft-cg" type="button" value="Log in"
+                            <input class="btn btn-success ft-cg" type="button" value="Log in" name="login"
                                 onclick="if(validateLogin()) {
                                     this.disabled = true;
-                                    jxRequest('POST', 'utilities', prepareLogin, 0, loginHandle);
+                                    jxRequest('POST', 'utilities', prepareLogin, loginHandle);
                                 }">
                         </div>
                     </form>
@@ -135,8 +135,11 @@
                         <p class="error-msg" hidden><p> <!-- 8 -->
                             
                         <div class="input-group">
-                            <input class="btn btn-info ft-cg" type="button" value="Sign up"
-                                   onclick="validateSignUp()">
+                            <input class="btn btn-info ft-cg" type="button" value="Sign up" name="signup"
+                                   onclick="if(validateSignUp()) {
+                                        this.disabled = true;
+                                        jxRequest('POST', 'utilities', prepareSignUp, signUpHandle);
+                                    }">
                         </div>
                     </form>
                 </div>
