@@ -1,9 +1,21 @@
+<%@page import="java.util.Random"%>
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
 <html>
     <head>
         <title>search</title>
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+        
+        <link rel="stylesheet" href="styles/bootstrap.min.css">
+        <link rel="stylesheet" href="styles/bootstrap.min.css">
+        <link rel="stylesheet" href="styles/jquery-ui.css" />
+        <link rel="stylesheet" href="styles/main.css">
+        <link rel="stylesheet" href="styles/base.css">
+        <script src="scripts/jquery.min.js"></script>
+        <script src="scripts/bootstrap.min.js"></script>
+        <script src="scripts/jquery.min.js"></script>
+        <script src="scripts/bootstrap.min.js"></script>
+        <script src="scripts/jquery-1.12.1.min.js"></script>
+        <script src="scripts/jquery-ui.min.js"></script>
+        <script src="scripts/utilities.js?version=<%=new Random().nextInt(1000)%>"></script>
         <script>
             
             var firstStr = "<div class=\"col-md-4\">"
@@ -56,6 +68,7 @@
     </head>
 
     <body>
+                <%@include file="navbar.jsp"%> 
         <form id="form">  
             <div class="row">
                 <div class="form-group col-md-4">

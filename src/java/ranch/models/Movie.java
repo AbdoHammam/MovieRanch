@@ -209,8 +209,8 @@ public class Movie implements Serializable {
 	Calendar cal = Calendar.getInstance();
 	LocalDate date = LocalDate.parse(format.format(cal.getTime()));
 	
-        String query = "insert into Renting(movieId, userId, dueDate, isReturned) values(" + id + "," + userId +",\"" +
-                date.plusDays(duration).toString() + "\", 0)";
+        String query = "insert into Renting(movieId, userId, dueDate) values(" + id + "," + userId +",'" +
+                date.plusDays(duration).toString() + "')";
         Statement statement;
         try {
             statement = connection.createStatement();

@@ -6,16 +6,19 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import ranch.db.DatabaseConnection;
+import ranch.db.DatabaseModule;
 import ranch.models.Movie;
 import ranch.models.User;
 
@@ -44,13 +47,21 @@ public class Utilities extends HttpServlet {
             else if(option.equals("signup")) 
                 out.print(doSignUp(request, response));
             else if (option.equals("getPassword"))
-                out.print(User.getPassword(Integer.parseInt(request.getParameter("id"))));
+                out.print(User.getPassword(request));
             else if (option.equals("rentMovie"))
                 out.print(rent(request));
             else if(option.equals("search"))
                 out.print(search(request));
             else if(option.equals("addMovie"))
                 out.print(doAddMovie(request));
+            else if(option.equals("extend")){
+                extendMovie(request);
+                response.sendRedirect("home.jsp");
+            }
+            else if(option.equals("return")){
+                returnMovie(request);
+                response.sendRedirect("home.jsp");
+            }
             else {
                 SessionControl.removeSession(request, response);
                 response.sendRedirect("login");                
@@ -158,7 +169,8 @@ public class Utilities extends HttpServlet {
 
     private String rent(HttpServletRequest request) {
         int duration = Integer.parseInt(request.getParameter("duration"));
-        int userId = Integer.parseInt(request.getParameter("id"));
+        String tmp = request.getParameter("token");
+        int userId = SessionControl.getId(tmp, request);
         int movieId = Integer.parseInt(request.getParameter("xid"));
 
         Movie movie = Movie.getMovie(movieId);
@@ -179,6 +191,44 @@ public class Utilities extends HttpServlet {
         String option = request.getParameter("key");
         String result = Movie.getAllMatchingMovies(value, option); 
         return result;
+    }
+    
+    private void returnMovie(HttpServletRequest request){
+        int movieId = Integer.parseInt(request.getParameter("id"));
+        Cookie cookie = SessionControl.acquireCookie("token", request);
+        int userId = SessionControl.getId(cookie.getValue(), request);
+        
+        Connection connection = DatabaseConnection.getActiveConnection();
+        try {
+            Statement statement = connection.createStatement();
+            String query = "delete from renting where movieId = " + movieId + " and userId = " + userId;
+            statement.executeUpdate(query);
+            query = "update movie set availableNumber = availableNumber + 1, rentedNumber = rentedNumber - 1 where id = " + movieId;
+            statement.executeUpdate(query);
+        } catch (SQLException ex) {
+            Logger.getLogger(Utilities.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    private void extendMovie(HttpServletRequest request){
+        int movieId = Integer.parseInt(request.getParameter("id"));
+        Cookie cookie = SessionControl.acquireCookie("token", request);
+        int userId = SessionControl.getId(cookie.getValue(), request);
+        Movie movie = Movie.getMovie(movieId);
+        User user = User.getUser(userId);
+        if(user.getBalance() < movie.getRentalPrice())
+            return;
+        String query = "update user set balance = balance - " + movie.getRentalPrice() + " where id = " + userId;
+        Connection connection = DatabaseConnection.getActiveConnection();
+        try {
+            Statement statement = connection.createStatement();
+            statement.executeUpdate(query);
+            query = "update renting set dueDate = dueDate + 1 where userId = " + userId + " and movieId = " + movie.getId();
+            statement.executeUpdate(query);
+        } catch (SQLException ex) {
+            Logger.getLogger(Utilities.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
     }
     
     @Override

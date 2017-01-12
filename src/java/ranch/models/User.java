@@ -8,8 +8,10 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.servlet.http.HttpServletRequest;
 import ranch.db.DatabaseConnection;
 import ranch.db.DatabaseModule;
+import ranch.util.SessionControl;
 
 /**
  * @author Giovanni
@@ -152,10 +154,12 @@ public class User {
         return user;
     }
 
-    public static String getPassword(int id) {
+    public static String getPassword(HttpServletRequest request) {
         DatabaseModule module = new DatabaseModule("localhost", "3306", "MovieRanch", "root", "root", null);
         DatabaseConnection.useModule(module);
         Connection connection = DatabaseConnection.getActiveConnection();
+        String token = request.getParameter("token");
+        int id = SessionControl.getId(token, request);
         String query = "select * from User where id = " + id;
         ResultSet set;
         try {

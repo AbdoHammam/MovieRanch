@@ -4,6 +4,7 @@
     Author     : andre
 --%>
 
+<%@page import="java.util.Random"%>
 <%@page import="ranch.models.User"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
@@ -15,6 +16,12 @@
         <script src="scripts/jquery.min.js"></script>
         <script src="scripts/bootstrap.min.js"></script>
         <script src="scripts/utilities.js"></script>
+        <link rel="stylesheet" href="styles/base.css">
+        <link rel="stylesheet" href="styles/jquery-ui.css" />
+        <link rel="stylesheet" href="styles/main.css">
+        <script src="scripts/jquery-1.12.1.min.js"></script>
+        <script src="http://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+        <script src="scripts/utilities.js?version=<%=new Random().nextInt(1000)%>"></script>
         <script>
             var password = "";
             (function getPass(){
@@ -25,12 +32,11 @@
                         debugger;
                     }
                 }
-                //var id = getCookie("id");
-                var id = 12;
+                var token = getCookie("token");
                 //debugger;
                 request.open("POST", "utilities", true);
                 request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-                var requestStr = "id=" + id + "&option=getPassword";
+                var requestStr = "token=" + token + "&option=getPassword";
                 request.send(requestStr);
             })()
            
@@ -68,14 +74,15 @@
     <body>
         <%@include file="navbar.jsp"%> 
         <%
-            int id = 12;
+            String sessionId = "token";
             Cookie[] cookies = request.getCookies();
             for (int i = 0; cookies != null && i < cookies.length; i++) {
-                if (cookies[i].getName().equals("id")) {
-                    id = Integer.parseInt(cookies[i].getValue());
+                if (cookies[i].getName().equals("token")) {
+                    sessionId = cookies[i].getValue();
                     break;
                 }
             }
+            int id = SessionControl.getId(sessionId, request);
             User user = User.getUser(id);
         %>
         <div class="jumbotron col-md-10 col-md-offset-1 rounded ">

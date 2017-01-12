@@ -60,7 +60,7 @@ public class UpdateMovie extends HttpServlet {
         movie.setRentalPrice(rentingPrice);
         
         Movie.updateMovie(movie);
-        response.sendRedirect("http://localhost:8080/movieranch/editmovie.jsp?id=" + movie.getId());
+        response.sendRedirect("http://localhost:8080/movieranch/home.jsp");
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

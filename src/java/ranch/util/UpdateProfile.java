@@ -35,7 +35,13 @@ public class UpdateProfile extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         String name, password, email, gender, address;
+        
+        //
         int id = Integer.parseInt(request.getParameter("id"));
+        //String tmp = request.getParameter("token");
+        //int id = SessionControl.getId(tmp, request);
+        //int id = request.getParameter("id");
+        //
         double balance;
         address = request.getParameter("address");
         email = request.getParameter("email");
@@ -52,7 +58,7 @@ public class UpdateProfile extends HttpServlet {
         user.setPassword(password);
         user.setUsername(name);
         User.updateUserInfo(user);
-        response.sendRedirect("home.html");
+        response.sendRedirect("home.jsp");
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

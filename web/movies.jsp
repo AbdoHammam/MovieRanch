@@ -4,6 +4,7 @@
     Author     : andre
 --%>
 
+<%@page import="java.util.Random"%>
 <%@page import="ranch.models.Movie"%>
 <%@page import="ranch.db.DatabaseModule"%>
 <%@page import="ranch.models.User"%>
@@ -12,10 +13,16 @@
 <html>
     <head>
         <title>movies</title>
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-        <script src="scripts/utilities.js"></script>
+        <link rel="stylesheet" href="styles/base.css?v=1">
+        <link rel="stylesheet" href="styles/bootstrap.min.css">
+        <link rel="stylesheet" href="styles/jquery-ui.css" />
+        <link rel="stylesheet" href="styles/main.css">
+        <script src="scripts/jquery.min.js"></script>
+        <script src="scripts/bootstrap.min.js"></script>
+        <script src="scripts/jquery-1.12.1.min.js"></script>
+        <script src="scripts/jquery-ui.min.js"></script>
+        <script src="scripts/utilities.js?version=<%=new Random().nextInt(1000)%>"></script>
+        
         <script>
             var isClicked = false;
             $(document).ready(function () {
@@ -28,12 +35,6 @@
                     isClicked = !isClicked;
                 })
             })
-            function runAtBegenning() {
-                if (document.cookie.indexOf("id") < 0) {
-                    //  window.location.assign("login.html");
-                }
-            }
-            runAtBegenning();
             
             function check(){
              //   var userId = getCookie("id");
@@ -54,14 +55,17 @@
                         else
                         {
                             alert("rented !, your current balance is " + response);
-                            location.reload(true);
+                            
+                            //location.reload(true);
+                            window.location.assign("home.jsp");
                         } 
                     }
                 }
                 request.open("POST","utilities" , true);
+                var id = getCookie("token");
                 request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-                var movieId = 111;
-                var requestStr = "id=12&duration="+duration+"&option=rentMovie&xid=" + movieId;
+                var movieId = window.location.search.substring(window.location.search.indexOf("id=") + 3);
+                var requestStr = "token=" + id + "&duration="+duration+"&option=rentMovie&xid=" + movieId;
                 debugger;
                 request.send(requestStr);
                 
@@ -80,6 +84,7 @@
     </head>
 
     <body>
+        <%@include file="navbar.jsp" %>
         <%
             int id = -1;
             Cookie[] cookies = request.getCookies();

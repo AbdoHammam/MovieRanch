@@ -4,6 +4,7 @@
     Author     : andre
 --%>
 
+<%@page import="java.util.Random"%>
 <%@page import="ranch.models.User"%>
 <%@page import="ranch.models.Movie"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
@@ -15,8 +16,19 @@
         <link rel="stylesheet" href="styles/bootstrap.min.css">
         <script src="scripts/jquery.min.js"></script>
         <script src="scripts/bootstrap.min.js"></script>
+        <link rel="stylesheet" href="http://jquery.com/jquery-wp-content/themes/jquery/css/base.css?v=1">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+        <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css" />
+        <link rel="stylesheet" href="styles/main.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+        <script src="http://code.jquery.com/jquery-1.12.1.min.js"></script>
+        <script src="http://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+        <script src="scripts/utilities.js?version=<%=new Random().nextInt(1000)%>"></script>
         <script>
-
+               function CancelButton(){
+                   window.location.assign("home.jsp")
+               }
         </script>
         <style>
             body {
@@ -28,16 +40,16 @@
     <body>
         <%@include file="navbar.jsp"%> 
         <%
-            int id = -1;
+            /*String token = "";
             Cookie[] cookies = request.getCookies();
             for (int i = 0; cookies != null && i < cookies.length; i++) {
-                if (cookies[i].getName().equals("id")) {
-                    id = Integer.parseInt(cookies[i].getValue());
+                if (cookies[i].getName().equals("token")) {
+                    token = cookies[i].getValue();
                     break;
                 }
             }
-            User user = User.getUser(id);// to be used in the top bar, after it's added !
-            id = Integer.parseInt(request.getParameter("id"));
+            int id = SessionControl.getId(token, request);*/
+            int id = Integer.parseInt(request.getParameter("id"));
             Movie movie = Movie.getMovie(id);
         %>
         <div class=" row">

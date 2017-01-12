@@ -27,7 +27,7 @@ public class ServletListener implements ServletContextListener {
         dbModule.setPort("3306");
         dbModule.setDatabaseName("movieranch");
         dbModule.setUser("root");
-        dbModule.setPassword("royal");
+        dbModule.setPassword("root");
         DatabaseConnection.useModule(dbModule);
     }
     

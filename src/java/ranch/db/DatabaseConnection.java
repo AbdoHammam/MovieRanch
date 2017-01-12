@@ -22,6 +22,7 @@ public class DatabaseConnection {
                     + " Use DatabaseConnection.useModule(DatabaseModule) to set the module first.");
         try {
             Class.forName("com.mysql.jdbc.Driver"); //We don't need this in Java 1.8
+            dbModule = new DatabaseModule("localhost", "3306", "MovieRanch", "root", "root", null);
             dbConnection = DriverManager.getConnection(dbModule.getConnectionURL());
             return dbConnection;
         } catch (SQLException | ClassNotFoundException e){
